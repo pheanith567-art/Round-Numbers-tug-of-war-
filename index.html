@@ -1,0 +1,1364 @@
+<!DOCTYPE html>
+<html lang="km">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ល្បែងទាញព្រ័ត្រគណិតវិទ្យា - ការបង្គត់ចំនួន</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Kantumruy+Pro:wght@400;600;700;800&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
+
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-user-select: none; }
+    body {
+      font-family: 'Kantumruy Pro', sans-serif;
+      background: linear-gradient(to bottom, #dbeafe 0%, #e0f2fe 45%, #e2f4e9 80%, #ccead7 100%);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 24px;
+    }
+    .brand { display: flex; align-items: center; gap: 10px; font-size: 20px; font-weight: 800; color: #1e3a8a; }
+    .brand-icon {
+      background: #2563eb;
+      color: white;
+      width: 34px;
+      height: 34px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-family: 'Poppins', sans-serif;
+      box-shadow: 0 2px 6px rgba(37, 99, 235, 0.35);
+    }
+    
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .timer-badge {
+      background: #0f172a;
+      color: #38ef7d;
+      font-family: 'Poppins', sans-serif;
+      padding: 6px 16px;
+      border-radius: 20px;
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+    }
+
+    .btn-sound-toggle {
+      background: #ffffff;
+      border: 1px solid #cbd5e1;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      cursor: pointer;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+
+    .btn-download-top {
+      padding: 7px 14px;
+      border-radius: 20px;
+      border: 1px solid #10b981;
+      background: #ecfdf5;
+      cursor: pointer;
+      font-weight: 700;
+      font-family: inherit;
+      color: #065f46;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      transition: all 0.2s;
+    }
+    .btn-download-top:hover { background: #d1fae5; }
+
+    .btn-top-menu {
+      padding: 7px 18px;
+      border-radius: 20px;
+      border: 1px solid #cbd5e1;
+      background: #fff;
+      cursor: pointer;
+      font-weight: 700;
+      font-family: inherit;
+      color: #334155;
+    }
+    .btn-top-menu:hover { background: #f8fafc; }
+
+    /* Game Arena */
+    .game-arena {
+      flex: 1;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 30px;
+      max-width: 1420px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    .player-panel {
+      width: 335px;
+      background: #fff;
+      border-radius: 24px;
+      overflow: hidden;
+      box-shadow: 0 12px 28px rgba(0,0,0,0.12);
+      z-index: 10;
+      border: 3px solid transparent;
+      transition: transform 0.15s ease;
+    }
+
+    .blue-side { border-color: #3b82f6; }
+    .blue-header { background: #2563eb; color: white; padding: 10px 16px; display: flex; justify-content: space-between; align-items: center; font-weight: 800; font-size: 17px; }
+    .blue-display { background: #3b82f6; color: white; text-align: center; padding: 14px 10px; min-height: 90px; display:flex; flex-direction:column; align-items:center; justify-content:center; }
+
+    .red-side { border-color: #ef4444; }
+    .red-header { background: #dc2626; color: white; padding: 10px 16px; display: flex; justify-content: space-between; align-items: center; font-weight: 800; font-size: 17px; }
+    .red-display { background: #ef4444; color: white; text-align: center; padding: 14px 10px; min-height: 90px; display:flex; flex-direction:column; align-items:center; justify-content:center; }
+
+    .task-inst-pill {
+      font-size: 12px;
+      font-weight: 700;
+      background: rgba(0,0,0,0.25);
+      padding: 3px 12px;
+      border-radius: 12px;
+      margin-bottom: 5px;
+    }
+    .task-content-main {
+      font-size: 30px;
+      font-weight: 800;
+      font-family: 'Poppins', sans-serif;
+      line-height: 1.35;
+      letter-spacing: 2px;
+    }
+
+    .qr-trigger-btn {
+      background: rgba(255, 255, 255, 0.25);
+      border: 1px solid rgba(255, 255, 255, 0.5);
+      border-radius: 12px;
+      padding: 4px 10px;
+      font-size: 13px;
+      color: white;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-family: inherit;
+      font-weight: 700;
+    }
+    .qr-trigger-btn:hover { background: rgba(255, 255, 255, 0.4); }
+    .status-dot { width: 8px; height: 8px; border-radius: 50%; background: #cbd5e1; display: inline-block; }
+    .status-dot.connected { background: #4ade80; box-shadow: 0 0 6px #4ade80; }
+
+    .input-box-wrapper { padding: 10px 14px 4px; }
+    .answer-display {
+      width: 100%;
+      height: 48px;
+      background: #f1f5f9;
+      border: 2px solid #e2e8f0;
+      border-radius: 14px;
+      font-size: 24px;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #1e293b;
+      font-family: 'Poppins', sans-serif;
+    }
+    .placeholder { color: #94a3b8; }
+
+    /* Keypad */
+    .keypad { padding: 8px 14px 14px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 7px; }
+    .key-btn { height: 46px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; font-family: 'Poppins', sans-serif; font-size: 20px; font-weight: 700; cursor: pointer; }
+    .key-btn:active { transform: scale(0.95); background: #e2e8f0; }
+    .key-btn.backspace { color: #ef4444; }
+    .key-btn.submit-blue { background: #2563eb; color: white; border: none; }
+    .key-btn.submit-red { background: #dc2626; color: white; border: none; }
+
+    /* Arena Stage */
+    .rope-stage-container {
+      flex: 1;
+      height: 440px;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      align-items: center;
+      padding-bottom: 25px;
+    }
+
+    .mud-pit {
+      position: absolute;
+      bottom: 84px;
+      width: 250px;
+      height: 60px;
+      background: radial-gradient(ellipse at 50% 40%, #1c0e05 0%, #3e1b08 60%, #683812 100%);
+      border: 4px solid #7c4015;
+      border-radius: 50%;
+      z-index: 1;
+      box-shadow: inset 0 8px 16px rgba(0,0,0,0.8), 0 4px 10px rgba(0,0,0,0.25);
+    }
+
+    .center-pole-assembly {
+      position: absolute;
+      bottom: 95px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      z-index: 4;
+      pointer-events: none;
+    }
+    .pole-tip {
+      width: 22px;
+      height: 32px;
+      background: linear-gradient(135deg, #fef08a, #d97706, #78350f);
+      clip-path: polygon(50% 0%, 90% 60%, 70% 100%, 30% 100%, 10% 60%);
+    }
+    .pole-stem { width: 14px; height: 140px; background: linear-gradient(to right, #fef08a, #d97706, #78350f); }
+    .pole-base { width: 44px; height: 16px; background: linear-gradient(to bottom, #ca8a04, #542409); border-radius: 50%; }
+
+    .tug-team-assembly {
+      position: absolute;
+      display: flex;
+      align-items: center;
+      transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      bottom: 92px;
+      z-index: 3;
+    }
+    .rope-bar {
+      width: 330px;
+      height: 13px;
+      background: repeating-linear-gradient(45deg, #d97706, #d97706 8px, #854d0e 8px, #854d0e 16px);
+      border-radius: 6px;
+      box-shadow: 0 3px 6px rgba(0,0,0,0.3);
+    }
+    .char-fig { width: 155px; height: 185px; filter: drop-shadow(0 6px 8px rgba(0,0,0,0.22)); }
+    .boy-fig { margin-right: -28px; }
+    .girl-fig { margin-left: -28px; }
+
+    .tug-gauge-wrapper-khmer {
+      width: 380px;
+      background: #ffffff;
+      padding: 8px 18px;
+      border-radius: 24px;
+      box-shadow: 0 6px 16px rgba(0,0,0,0.08);
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      z-index: 10;
+    }
+    .gauge-header-labels { display: flex; justify-content: space-between; align-items: center; font-size: 13px; font-weight: 700; color: #334155; }
+    .flag-wrap { display: flex; align-items: center; gap: 6px; }
+    .khmer-flag-badge { display: inline-flex; flex-direction: column; width: 25px; height: 16px; border: 1px solid #cbd5e1; border-radius: 3px; overflow: hidden; }
+    .khmer-flag-badge .fb-b { height: 25%; background: #032ea1; }
+    .khmer-flag-badge .fb-r { height: 50%; background: #e00025; position: relative; }
+    .khmer-flag-badge .fb-r::after { content: '🏰'; position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%) scale(0.45); line-height: 0; }
+
+    .gauge-track-khmer { height: 14px; background: #e2e8f0; border-radius: 10px; overflow: hidden; display: flex; position: relative; }
+    .gauge-fill-blue { background: #2563eb; height: 100%; width: 50%; transition: width 0.3s; }
+    .gauge-fill-red { background: #dc2626; height: 100%; width: 50%; transition: width 0.3s; }
+    .gauge-center-pin { position: absolute; left: 50%; top: 0; bottom: 0; width: 4px; background: #fde047; transform: translateX(-50%); z-index: 2; }
+
+    /* Setup Modal */
+    .modal-backdrop {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(7, 13, 23, 0.92);
+      backdrop-filter: blur(8px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 200;
+      overflow-y: auto;
+      padding: 20px 10px;
+    }
+    .setup-card {
+      background: #0b1320;
+      border: 1px solid #1e293b;
+      border-radius: 28px;
+      width: 95%;
+      max-width: 530px;
+      padding: 24px 20px;
+      text-align: center;
+      color: #fff;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.6);
+    }
+    .trophy-badge {
+      width: 65px;
+      height: 65px;
+      background: #059669;
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 32px;
+      margin: 0 auto 10px;
+      box-shadow: 0 0 20px rgba(16, 185, 129, 0.4);
+    }
+    .setup-title { font-family: 'Poppins', sans-serif; font-size: 26px; font-weight: 800; letter-spacing: 1px; margin-bottom: 2px; }
+    .setup-subtitle { font-size: 13px; color: #94a3b8; margin-bottom: 16px; line-height: 1.4; }
+    
+    .section-label {
+      font-size: 11px;
+      font-weight: 700;
+      color: #10b981;
+      letter-spacing: 0.8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+    }
+
+    .single-grade-box { display: flex; justify-content: center; margin-bottom: 14px; }
+    .btn-pill-grade-single {
+      background: rgba(16, 185, 129, 0.12);
+      border: 2px solid #10b981;
+      color: #10b981;
+      font-size: 15px;
+      font-weight: 800;
+      padding: 8px 34px;
+      border-radius: 14px;
+      box-shadow: 0 0 12px rgba(16, 185, 129, 0.25);
+      cursor: default;
+    }
+
+    /* 2. Operations (បង្គត់ត្រឹមខ្ទង់ដប់, បង្គត់ខ្ទង់រយ, បង្គត់ខ្ទង់ពាន់, បង្គត់ខ្ទង់ដប់ រយ និងពាន់) */
+    .rounding-mode-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-bottom: 16px;
+    }
+    .btn-pill-rounding {
+      background: #0f172a;
+      border: 2px solid #1e293b;
+      color: #94a3b8;
+      font-size: 13px;
+      font-weight: 700;
+      padding: 9px;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-pill-rounding.active {
+      border-color: #10b981;
+      color: #10b981;
+      background: rgba(16, 185, 129, 0.12);
+      box-shadow: 0 0 10px rgba(16, 185, 129, 0.25);
+    }
+
+    /* 3. Difficulty Level */
+    .difficulty-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 16px; }
+    .btn-pill-diff { background: #0f172a; border: 2px solid #1e293b; color: #94a3b8; font-size: 13px; font-weight: 700; padding: 7px; border-radius: 12px; cursor: pointer; transition: all 0.2s; }
+    .btn-pill-diff.active { border-color: #10b981; color: #10b981; background: rgba(16, 185, 129, 0.12); }
+
+    /* 4. Numbers Level (2digits, 3digits, 4digit, mixed-up digits) */
+    .numbers-digits-grid-4 {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+    .btn-pill-digit {
+      background: #0f172a;
+      border: 2px solid #1e293b;
+      color: #94a3b8;
+      font-family: 'Poppins', sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      padding: 10px 6px;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+      white-space: nowrap;
+      text-align: center;
+    }
+    .btn-pill-digit.active {
+      border-color: #10b981;
+      color: #10b981;
+      background: rgba(16, 185, 129, 0.1);
+      box-shadow: 0 0 10px rgba(16, 185, 129, 0.2);
+    }
+
+    /* 5. Game Time */
+    .time-five-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 6px;
+      margin-bottom: 20px;
+    }
+    .time-pill-btn {
+      background: #0f172a;
+      border: 2px solid #1e293b;
+      color: #94a3b8;
+      font-family: 'Poppins', sans-serif;
+      font-size: 12px;
+      font-weight: 700;
+      padding: 8px 2px;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .time-pill-btn.active {
+      border-color: #10b981;
+      color: #10b981;
+      background: rgba(16, 185, 129, 0.1);
+      box-shadow: 0 0 10px rgba(16, 185, 129, 0.2);
+    }
+
+    .action-buttons-group { display: flex; flex-direction: column; gap: 10px; }
+    .btn-play-action {
+      width: 100%;
+      background: #10b981;
+      color: #fff;
+      border: none;
+      padding: 13px;
+      border-radius: 16px;
+      font-family: 'Poppins', 'Kantumruy Pro', sans-serif;
+      font-size: 18px;
+      font-weight: 800;
+      letter-spacing: 1px;
+      cursor: pointer;
+      box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: all 0.2s;
+    }
+    .btn-play-action:hover { background: #059669; transform: translateY(-2px); }
+
+    .btn-download-action {
+      width: 100%;
+      background: #1e293b;
+      border: 1px solid #334155;
+      color: #38bdf8;
+      padding: 11px;
+      border-radius: 14px;
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: all 0.2s;
+    }
+    .btn-download-action:hover { background: #334155; color: #7dd3fc; }
+
+    .qr-modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.6); display: none; align-items: center; justify-content: center; z-index: 250; }
+    .qr-modal-box { background: white; padding: 24px; border-radius: 24px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.25); max-width: 360px; }
+    .btn-close-modal { background: #e2e8f0; border: none; padding: 8px 20px; border-radius: 10px; font-weight: 700; cursor: pointer; font-family: inherit; }
+
+    .winner-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); display: none; align-items: center; justify-content: center; z-index: 300; }
+    .winner-modal { background: white; padding: 30px 40px; border-radius: 24px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+
+    /* Mobile Screen UI */
+    #mobileControllerScreen {
+      display: none;
+      flex-direction: column;
+      min-height: 100vh;
+      padding: 16px;
+      background: #f1f5f9;
+      max-width: 480px;
+      margin: 0 auto;
+      width: 100%;
+    }
+    .mobile-role-card {
+      text-align: center;
+      padding: 12px;
+      border-radius: 16px;
+      color: white;
+      font-weight: 800;
+      font-size: 18px;
+      margin-bottom: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    .mobile-question-card {
+      background: white;
+      border-radius: 20px;
+      padding: 16px;
+      box-shadow: 0 6px 16px rgba(0,0,0,0.06);
+      text-align: center;
+      margin-bottom: 12px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Host Screen (កុំព្យូទ័រ / Smart TV) -->
+  <div id="hostScreen" style="display: flex; flex-direction: column; min-height: 100vh;">
+    <header>
+      <div class="brand">
+        <div class="brand-icon">N</div>
+        <span>ល្បែងទាញព្រ័ត្រគណិតវិទ្យា (ការបង្គត់ចំនួន)</span>
+      </div>
+      
+      <div class="header-actions">
+        <div class="timer-badge" id="timerBadge">03:00</div>
+        <button class="btn-sound-toggle" id="btnSoundToggle" onclick="toggleSound()" title="បិទ/បើក សំឡេង">🔊</button>
+        <button class="btn-download-top" onclick="downloadSourceCode()" title="ទាញយកឯកសារកូដ HTML នេះទុក">💾 ទាញយកកូដ</button>
+        <button class="btn-top-menu" onclick="openSetupModal()">⚙️ កំណត់ហ្គេម</button>
+      </div>
+    </header>
+
+    <div class="game-arena">
+      <!-- ក្រុមខៀវ -->
+      <div class="player-panel blue-side" id="panel-1">
+        <div class="blue-header">
+          <div>ខៀវ <span id="score-p1">★ 0</span></div>
+          <button class="qr-trigger-btn" onclick="openQRModal(1)">
+            <span class="status-dot" id="dot-p1"></span> 📱 ស្កេន
+          </button>
+        </div>
+        <div class="blue-display" id="question-p1">
+          <div class="task-inst-pill" id="task-inst-p1">--</div>
+          <div class="task-content-main" id="task-content-p1">--</div>
+        </div>
+
+        <div id="input-wrap-p1">
+          <div class="input-box-wrapper">
+            <div class="answer-display placeholder" id="input-p1">?</div>
+          </div>
+          <div class="keypad">
+            <button class="key-btn" onclick="pressKey(1, '1')">1</button>
+            <button class="key-btn" onclick="pressKey(1, '2')">2</button>
+            <button class="key-btn" onclick="pressKey(1, '3')">3</button>
+            <button class="key-btn" onclick="pressKey(1, '4')">4</button>
+            <button class="key-btn" onclick="pressKey(1, '5')">5</button>
+            <button class="key-btn" onclick="pressKey(1, '6')">6</button>
+            <button class="key-btn" onclick="pressKey(1, '7')">7</button>
+            <button class="key-btn" onclick="pressKey(1, '8')">8</button>
+            <button class="key-btn" onclick="pressKey(1, '9')">9</button>
+            <button class="key-btn backspace" onclick="pressKey(1, 'DEL')">⌫</button>
+            <button class="key-btn" onclick="pressKey(1, '0')">0</button>
+            <button class="key-btn submit-blue" onclick="submitRoundingAnswer(1)">✓</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ទីលានទាញព្រ័ត្រកណ្តាល -->
+      <div class="rope-stage-container">
+        <div class="mud-pit"></div>
+
+        <div class="center-pole-assembly">
+          <div class="pole-tip"></div>
+          <div class="pole-stem"></div>
+          <div class="pole-base"></div>
+        </div>
+
+        <div class="tug-team-assembly" id="ropeAssembly">
+          <svg class="char-fig boy-fig" viewBox="0 0 170 200">
+            <path d="M 72,135 L 45,188" stroke="#fcd34d" stroke-width="15" stroke-linecap="round"/>
+            <path d="M 94,135 L 122,188" stroke="#fcd34d" stroke-width="15" stroke-linecap="round"/>
+            <circle cx="42" cy="188" r="8" fill="#fcd34d"/>
+            <circle cx="125" cy="188" r="8" fill="#fcd34d"/>
+            <path d="M 54,110 C 46,140 60,154 78,148 C 86,142 92,142 98,148 C 114,154 124,140 116,110 Z" fill="#1e3a8a"/>
+            <rect x="54" y="104" width="62" height="15" rx="4" fill="#f43f5e"/>
+            <path d="M 58,104 L 58,119 M 68,104 L 68,119 M 78,104 L 78,119 M 88,104 L 88,119 M 98,104 L 98,119 M 108,104 L 108,119" stroke="#ffffff" stroke-width="2.5"/>
+            <path d="M 56,68 L 110,68 L 114,108 L 52,108 Z" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
+            <path d="M 70,82 L 138,96" stroke="#fcd34d" stroke-width="14" stroke-linecap="round"/>
+            <circle cx="82" cy="40" r="30" fill="#fcd34d"/>
+            <path d="M 52,35 C 50,8 88,0 114,16 C 118,26 116,42 102,35 C 92,22 68,22 52,35 Z" fill="#381e0d"/>
+            <circle cx="95" cy="38" r="4.5" fill="#1e293b"/>
+            <path d="M 88,50 Q 98,60 106,48" stroke="#b91c1c" stroke-width="3" fill="white" stroke-linecap="round"/>
+          </svg>
+
+          <div class="rope-bar"></div>
+
+          <svg class="char-fig girl-fig" viewBox="0 0 170 200" style="transform: scaleX(-1);">
+            <path d="M 72,135 L 45,188" stroke="#fcd34d" stroke-width="15" stroke-linecap="round"/>
+            <path d="M 94,135 L 122,188" stroke="#fcd34d" stroke-width="15" stroke-linecap="round"/>
+            <circle cx="42" cy="188" r="8" fill="#fcd34d"/>
+            <circle cx="125" cy="188" r="8" fill="#fcd34d"/>
+            <path d="M 54,110 C 46,140 60,154 78,148 C 86,142 92,142 98,148 C 114,154 124,140 116,110 Z" fill="#991b1b"/>
+            <path d="M 56,68 L 110,68 L 114,108 L 52,108 Z" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
+            <path d="M 58,70 L 106,110 L 96,115 L 50,75 Z" fill="#e11d48"/>
+            <path d="M 70,82 L 138,96" stroke="#fcd34d" stroke-width="14" stroke-linecap="round"/>
+            <path d="M 48,32 C 36,60 42,100 52,112 C 60,94 60,50 60,32 Z" fill="#221105"/>
+            <circle cx="82" cy="40" r="30" fill="#fcd34d"/>
+            <path d="M 52,35 C 50,10 88,2 112,18 C 116,28 112,42 102,35 C 92,22 68,22 52,35 Z" fill="#221105"/>
+            <circle cx="95" cy="38" r="4.5" fill="#1e293b"/>
+            <path d="M 88,50 Q 98,60 106,48" stroke="#b91c1c" stroke-width="3" fill="white" stroke-linecap="round"/>
+          </svg>
+        </div>
+
+        <div class="tug-gauge-wrapper-khmer">
+          <div class="gauge-header-labels">
+            <div class="flag-wrap">
+              <span class="khmer-flag-badge"><span class="fb-b"></span><span class="fb-r"></span><span class="fb-b"></span></span>
+              <span>ខៀវ</span>
+              <b id="lbl-score-left" style="color:#2563eb; margin-left:4px;">0</b>
+            </div>
+            <div class="flag-wrap">
+              <b id="lbl-score-right" style="color:#dc2626; margin-right:4px;">0</b>
+              <span>ក្រហម</span>
+              <span class="khmer-flag-badge"><span class="fb-b"></span><span class="fb-r"></span><span class="fb-b"></span></span>
+            </div>
+          </div>
+          <div class="gauge-track-khmer">
+            <div class="gauge-fill-blue" id="gaugeBlue"></div>
+            <div class="gauge-fill-red" id="gaugeRed"></div>
+            <div class="gauge-center-pin"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ក្រុមក្រហម -->
+      <div class="player-panel red-side" id="panel-2">
+        <div class="red-header">
+          <div>ក្រហម <span id="score-p2">★ 0</span></div>
+          <button class="qr-trigger-btn" onclick="openQRModal(2)">
+            <span class="status-dot" id="dot-p2"></span> 📱 ស្កេន
+          </button>
+        </div>
+        <div class="red-display" id="question-p2">
+          <div class="task-inst-pill" id="task-inst-p2">--</div>
+          <div class="task-content-main" id="task-content-p2">--</div>
+        </div>
+
+        <div id="input-wrap-p2">
+          <div class="input-box-wrapper">
+            <div class="answer-display placeholder" id="input-p2">?</div>
+          </div>
+          <div class="keypad">
+            <button class="key-btn" onclick="pressKey(2, '1')">1</button>
+            <button class="key-btn" onclick="pressKey(2, '2')">2</button>
+            <button class="key-btn" onclick="pressKey(2, '3')">3</button>
+            <button class="key-btn" onclick="pressKey(2, '4')">4</button>
+            <button class="key-btn" onclick="pressKey(2, '5')">5</button>
+            <button class="key-btn" onclick="pressKey(2, '6')">6</button>
+            <button class="key-btn" onclick="pressKey(2, '7')">7</button>
+            <button class="key-btn" onclick="pressKey(2, '8')">8</button>
+            <button class="key-btn" onclick="pressKey(2, '9')">9</button>
+            <button class="key-btn backspace" onclick="pressKey(2, 'DEL')">⌫</button>
+            <button class="key-btn" onclick="pressKey(2, '0')">0</button>
+            <button class="key-btn submit-red" onclick="submitRoundingAnswer(2)">✓</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- QR Modal Popup -->
+  <div class="qr-modal-overlay" id="qrModal">
+    <div class="qr-modal-box">
+      <h3 id="qrModalTitle" style="color:#1e293b;">ស្កេនបញ្ជាទូរសព្ទ</h3>
+      <p style="font-size:13px; color:#64748b;">ប្រើកាមេរ៉ាទូរសព្ទស្កេន QR Code នេះដើម្បីលេង (ដើរទាំង 4G/5G និង Wi-Fi)</p>
+      <div id="qrcodeCanvas"></div>
+      <button class="btn-close-modal" onclick="closeQRModal()">បិទ</button>
+    </div>
+  </div>
+
+  <!-- ================= MODAL SETUP (START SCREEN) ================= -->
+  <div class="modal-backdrop" id="setupModal">
+    <div class="setup-card">
+      <div class="trophy-badge">🏆</div>
+      <h2 class="setup-title">TUG OF WAR</h2>
+      <p class="setup-subtitle">ឆ្លើយសំណួរគណិតវិទ្យាឱ្យបានលឿន និងត្រឹមត្រូវ ដើម្បីទាញព្រ័ត្រទៅខាងអ្នក!</p>
+
+      <!-- 1. កម្រិតថ្នាក់ -->
+      <div class="section-label">🎓 កម្រិតថ្នាក់ (GRADE LEVEL)</div>
+      <div class="single-grade-box">
+        <div class="btn-pill-grade-single">ថ្នាក់ទី ៣</div>
+      </div>
+
+      <!-- 2. CHOOSE OPERATIONS -->
+      <div class="section-label">⚙️ CHOOSE OPERATIONS (ការបង្គត់ចំនួន)</div>
+      <div class="rounding-mode-grid">
+        <button class="btn-pill-rounding active" onclick="setRoundingMode('ten', this)">
+          🎯 បង្គត់ត្រឹមខ្ទង់ដប់ (Nearest 10)
+        </button>
+        <button class="btn-pill-rounding" onclick="setRoundingMode('hundred', this)">
+          🎯 បង្គត់ខ្ទង់រយ (Nearest 100)
+        </button>
+        <button class="btn-pill-rounding" onclick="setRoundingMode('thousand', this)">
+          🎯 បង្គត់ខ្ទង់ពាន់ (Nearest 1000)
+        </button>
+        <button class="btn-pill-rounding" onclick="setRoundingMode('mix', this)">
+          🔄 បង្គត់ខ្ទង់ដប់ រយ និងពាន់ (ចម្រុះ)
+        </button>
+      </div>
+
+      <!-- 3. កម្រិតលំហាត់ -->
+      <div class="section-label">⚡ កម្រិតលំហាត់ (DIFFICULTY LEVEL)</div>
+      <div class="difficulty-grid">
+        <button class="btn-pill-diff active" onclick="setDifficulty('easy', this)">ងាយ (Easy)</button>
+        <button class="btn-pill-diff" onclick="setDifficulty('medium', this)">មធ្យម (Medium)</button>
+        <button class="btn-pill-diff" onclick="setDifficulty('hard', this)">លំបាក (Hard)</button>
+      </div>
+
+      <!-- 4. NUMBERS LEVEL: 2digits, 3digits, 4digit, mixed-up digits -->
+      <div class="section-label"># NUMBERS LEVEL (ចំនួនខ្ទង់)</div>
+      <div class="numbers-digits-grid-4">
+        <button class="btn-pill-digit active" onclick="setDigitsLevel(2, this)">2 digits</button>
+        <button class="btn-pill-digit" onclick="setDigitsLevel(3, this)">3 digits</button>
+        <button class="btn-pill-digit" onclick="setDigitsLevel(4, this)">4 digits</button>
+        <button class="btn-pill-digit" onclick="setDigitsLevel('mixed', this)">Mixed-up digits</button>
+      </div>
+
+      <!-- 5. GAME TIME -->
+      <div class="section-label">⏱️ GAME TIME (រយៈពេលប្រកួត)</div>
+      <div class="time-five-grid">
+        <button class="time-pill-btn" onclick="setGameTime(1, this)">1 MIN</button>
+        <button class="time-pill-btn active" onclick="setGameTime(3, this)">3 MIN</button>
+        <button class="time-pill-btn" onclick="setGameTime(5, this)">5 MIN</button>
+        <button class="time-pill-btn" onclick="setGameTime(7, this)">7 MIN</button>
+        <button class="time-pill-btn" onclick="setGameTime(10, this)">10 MIN</button>
+      </div>
+
+      <!-- Actions -->
+      <div class="action-buttons-group">
+        <button class="btn-play-action" onclick="startGameFromModal()">
+          ▶ PLAY NOW
+        </button>
+        <button class="btn-download-action" onclick="downloadSourceCode()">
+          💾 ទាញយកកូដហ្គេមនេះ (Download HTML)
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Winner Modal -->
+  <div class="winner-overlay" id="winnerModal">
+    <div class="winner-modal">
+      <h2 id="winnerText" style="font-size:26px; color:#1e293b; margin-bottom:12px;">🏆 ខៀវឈ្នះ!</h2>
+      <p id="winnerReason" style="color:#64748b; margin-bottom:20px; font-size:15px;">បានពិន្ទុច្រើនជាងគេ</p>
+      <button class="btn-play-action" style="padding:10px 24px; font-size:16px;" onclick="openSetupModal()">ប្រកួតសារថ្មី</button>
+    </div>
+  </div>
+
+  <!-- Mobile Screen UI -->
+  <div id="mobileControllerScreen">
+    <div class="mobile-role-card" id="mobileRoleHeader">
+      ឧបករណ៍បញ្ជា
+    </div>
+
+    <div class="mobile-question-card">
+      <div class="task-inst-pill" id="mTaskInst" style="background:#f1f5f9; color:#1e293b; margin-bottom:8px;">--</div>
+      <div class="task-content-main" id="mTaskContent" style="color:#1e293b; margin-bottom:12px;">--</div>
+      
+      <div style="font-size:13px; font-weight:700; color:#64748b;">ចម្លើយបង្គត់៖</div>
+      <div class="answer-display placeholder" id="mInputDisplay" style="margin-top:6px;">?</div>
+      
+      <div class="keypad" style="padding:14px 0 0; gap:8px;">
+        <button class="key-btn" onclick="phoneSendKey('1')">1</button>
+        <button class="key-btn" onclick="phoneSendKey('2')">2</button>
+        <button class="key-btn" onclick="phoneSendKey('3')">3</button>
+        <button class="key-btn" onclick="phoneSendKey('4')">4</button>
+        <button class="key-btn" onclick="phoneSendKey('5')">5</button>
+        <button class="key-btn" onclick="phoneSendKey('6')">6</button>
+        <button class="key-btn" onclick="phoneSendKey('7')">7</button>
+        <button class="key-btn" onclick="phoneSendKey('8')">8</button>
+        <button class="key-btn" onclick="phoneSendKey('9')">9</button>
+        <button class="key-btn backspace" onclick="phoneSendKey('DEL')">⌫</button>
+        <button class="key-btn" onclick="phoneSendKey('0')">0</button>
+        <button class="key-btn" id="mSubmitBtn" onclick="phoneSendKey('ENTER')">✓</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ================= DOWNLOAD CODE FEATURE =================
+    function downloadSourceCode() {
+      playTapSound();
+      const htmlContent = "<!DOCTYPE html>\n" + document.documentElement.outerHTML;
+      const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'tug_of_war_math.html';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+
+    // ================= SOUND & AUDIO SYNTHESIZER =================
+    let audioCtx = null;
+    let isSoundEnabled = true;
+    let bgmInterval = null;
+
+    function initAudio() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+    }
+
+    function toggleSound() {
+      isSoundEnabled = !isSoundEnabled;
+      const btn = document.getElementById('btnSoundToggle');
+      if (btn) btn.innerText = isSoundEnabled ? '🔊' : '🔇';
+      if (!isSoundEnabled) {
+        stopBGM();
+      } else {
+        startBGM();
+      }
+    }
+
+    function playTapSound() {
+      if (!isSoundEnabled) return;
+      initAudio();
+      try {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(650, audioCtx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(300, audioCtx.currentTime + 0.05);
+
+        gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+        gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.05);
+
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.05);
+      } catch (e) {}
+    }
+
+    function playCorrectSound() {
+      if (!isSoundEnabled) return;
+      initAudio();
+      try {
+        const now = audioCtx.currentTime;
+        const notes = [523.25, 659.25, 783.99];
+        notes.forEach((freq, i) => {
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(freq, now + i * 0.08);
+
+          gain.gain.setValueAtTime(0.25, now + i * 0.08);
+          gain.gain.exponentialRampToValueAtTime(0.01, now + i * 0.08 + 0.18);
+
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          osc.start(now + i * 0.08);
+          osc.stop(now + i * 0.08 + 0.18);
+        });
+      } catch (e) {}
+    }
+
+    function playWrongSound() {
+      if (!isSoundEnabled) return;
+      initAudio();
+      try {
+        const now = audioCtx.currentTime;
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(150, now);
+        osc.frequency.linearRampToValueAtTime(90, now + 0.2);
+
+        gain.gain.setValueAtTime(0.25, now);
+        gain.gain.linearRampToValueAtTime(0.01, now + 0.2);
+
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start(now);
+        osc.stop(now + 0.2);
+      } catch (e) {}
+    }
+
+    function playVictorySound() {
+      if (!isSoundEnabled) return;
+      initAudio();
+      try {
+        const now = audioCtx.currentTime;
+        const melody = [
+          { f: 523.25, t: 0.12 },
+          { f: 659.25, t: 0.12 },
+          { f: 783.99, t: 0.12 },
+          { f: 1046.50, t: 0.35 }
+        ];
+        let offset = 0;
+        melody.forEach(n => {
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(n.f, now + offset);
+          gain.gain.setValueAtTime(0.3, now + offset);
+          gain.gain.exponentialRampToValueAtTime(0.01, now + offset + n.t);
+
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          osc.start(now + offset);
+          osc.stop(now + offset + n.t);
+          offset += n.t + 0.03;
+        });
+      } catch (e) {}
+    }
+
+    const bgmNotes = [
+      261.63, 329.63, 392.00, 329.63,
+      293.66, 349.23, 440.00, 349.23,
+      329.63, 392.00, 523.25, 392.00,
+      392.00, 349.23, 329.63, 293.66
+    ];
+    let bgmStep = 0;
+
+    function playBgmNote() {
+      if (!isSoundEnabled || !audioCtx) return;
+      try {
+        const freq = bgmNotes[bgmStep % bgmNotes.length];
+        bgmStep++;
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+
+        gain.gain.setValueAtTime(0.045, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.22);
+
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.22);
+      } catch (e) {}
+    }
+
+    function startBGM() {
+      stopBGM();
+      if (!isSoundEnabled) return;
+      initAudio();
+      bgmInterval = setInterval(playBgmNote, 240);
+    }
+
+    function stopBGM() {
+      if (bgmInterval) {
+        clearInterval(bgmInterval);
+        bgmInterval = null;
+      }
+    }
+
+    // ================= NETWORK (WebRTC + STUN Servers) =================
+    const peerConfig = {
+      config: {
+        iceServers: [
+          { urls: 'stun:stun.l.google.com:19302' },
+          { urls: 'stun:stun1.l.google.com:19302' },
+          { urls: 'stun:stun2.l.google.com:19302' }
+        ]
+      }
+    };
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const peerRole = urlParams.get('role');
+    const targetHostId = urlParams.get('host');
+
+    let peer = null, conn = null;
+
+    if (peerRole && targetHostId) {
+      document.getElementById('hostScreen').style.display = 'none';
+      document.getElementById('setupModal').style.display = 'none';
+      document.getElementById('mobileControllerScreen').style.display = 'flex';
+      
+      const mHeader = document.getElementById('mobileRoleHeader');
+      const mSubmit = document.getElementById('mSubmitBtn');
+
+      if (peerRole === 'p1') {
+        mHeader.innerText = '💙 ក្រុមខៀវ (ទូរសព្ទ)';
+        mHeader.style.background = '#2563eb';
+        mSubmit.style.background = '#2563eb';
+      } else {
+        mHeader.innerText = '❤️ ក្រុមក្រហម (ទូរសព្ទ)';
+        mHeader.style.background = '#dc2626';
+        mSubmit.style.background = '#dc2626';
+      }
+
+      peer = new Peer(peerConfig);
+      peer.on('open', () => {
+        conn = peer.connect(targetHostId, { metadata: { role: peerRole }, reliable: true });
+        setupConnectionEvents();
+      });
+
+      let localInput = '';
+
+      function setupConnectionEvents() {
+        conn.on('data', (d) => {
+          if (d.type === 'sync_rounding_task') {
+            document.getElementById('mTaskInst').innerText = d.instruction;
+            document.getElementById('mTaskContent').innerText = d.displayContent;
+
+            localInput = '';
+            let disp = document.getElementById('mInputDisplay');
+            disp.innerText = '?';
+            disp.classList.add('placeholder');
+          }
+        });
+      }
+
+      function phoneSendKey(key) {
+        playTapSound();
+        if (!conn || !conn.open) return;
+        if (key === 'DEL') {
+          localInput = localInput.slice(0, -1);
+        } else if (key === 'ENTER') {
+          // Submit
+        } else if (localInput.length < 8) {
+          localInput += key;
+        }
+
+        let disp = document.getElementById('mInputDisplay');
+        disp.innerText = localInput === '' ? '?' : localInput;
+        if (localInput === '') disp.classList.add('placeholder');
+        else disp.classList.remove('placeholder');
+
+        conn.send({ action: 'key', value: key });
+      }
+
+    } else {
+      const hostSessionId = 'tug-' + Math.random().toString(36).substring(2, 8);
+      peer = new Peer(hostSessionId, peerConfig);
+
+      let connMap = { 1: null, 2: null };
+
+      peer.on('connection', (c) => {
+        const pNum = c.metadata && c.metadata.role === 'p1' ? 1 : 2;
+        connMap[pNum] = c;
+        const dot = document.getElementById(`dot-p${pNum}`);
+        if (dot) dot.classList.add('connected');
+
+        c.on('open', () => {
+          syncTaskToMobile(pNum);
+        });
+
+        c.on('data', (data) => {
+          if (data.action === 'key') {
+            if (data.value === 'ENTER') {
+              submitRoundingAnswer(pNum);
+            } else {
+              pressKey(pNum, data.value);
+            }
+          }
+        });
+
+        c.on('close', () => {
+          if (dot) dot.classList.remove('connected');
+          connMap[pNum] = null;
+        });
+      });
+
+      function syncTaskToMobile(pNum) {
+        let st = pNum === 1 ? stateP1 : stateP2;
+        if (connMap[pNum] && connMap[pNum].open) {
+          connMap[pNum].send({
+            type: 'sync_rounding_task',
+            instruction: st.instruction,
+            displayContent: st.displayContent
+          });
+        }
+      }
+
+      function openQRModal(playerNum) {
+        playTapSound();
+        const currentURL = window.location.href.split('?')[0];
+        const connectURL = `${currentURL}?host=${hostSessionId}&role=p${playerNum}`;
+
+        document.getElementById('qrModalTitle').innerText = playerNum === 1 ? 'ស្កេនសម្រាប់ ក្រុមខៀវ' : 'ស្កេនសម្រាប់ ក្រុមក្រហម';
+        const qrContainer = document.getElementById('qrcodeCanvas');
+        qrContainer.innerHTML = '';
+        new QRCode(qrContainer, { text: connectURL, width: 180, height: 180 });
+
+        document.getElementById('qrModal').style.display = 'flex';
+      }
+
+      function closeQRModal() {
+        playTapSound();
+        document.getElementById('qrModal').style.display = 'none';
+      }
+
+      // Parameters
+      let selectedRoundingMode = 'ten'; // 'ten', 'hundred', 'thousand', 'mix'
+      let selectedDifficulty = 'easy';
+      let selectedDigits = 2; // 2, 3, 4, 'mixed'
+      let gameMinutes = 3;
+      let timerInterval = null;
+      let timeLeft = 180;
+
+      let ropePosition = 0;
+      const WIN_LIMIT = 5;
+
+      let stateP1 = { instruction: '', displayContent: '', answer: '', currentInput: '', score: 0 };
+      let stateP2 = { instruction: '', displayContent: '', answer: '', currentInput: '', score: 0 };
+
+      function openSetupModal() {
+        playTapSound();
+        stopBGM();
+        clearInterval(timerInterval);
+        document.getElementById('winnerModal').style.display = 'none';
+        document.getElementById('setupModal').style.display = 'flex';
+      }
+
+      function setRoundingMode(mode, btn) {
+        playTapSound();
+        selectedRoundingMode = mode;
+        document.querySelectorAll('.btn-pill-rounding').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+      }
+
+      function setDifficulty(diff, btn) {
+        playTapSound();
+        selectedDifficulty = diff;
+        document.querySelectorAll('.btn-pill-diff').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+      }
+
+      function setDigitsLevel(d, btn) {
+        playTapSound();
+        selectedDigits = d;
+        document.querySelectorAll('.btn-pill-digit').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+      }
+
+      function setGameTime(mins, btn) {
+        playTapSound();
+        gameMinutes = mins;
+        btn.parentElement.querySelectorAll('.time-pill-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+      }
+
+      function startGameFromModal() {
+        playTapSound();
+        document.getElementById('setupModal').style.display = 'none';
+        resetFullGame();
+        startTimer();
+        startBGM();
+      }
+
+      function startTimer() {
+        clearInterval(timerInterval);
+        timeLeft = gameMinutes * 60;
+        updateTimerDisplay();
+        timerInterval = setInterval(() => {
+          timeLeft--;
+          updateTimerDisplay();
+          if (timeLeft <= 0) {
+            clearInterval(timerInterval);
+            handleTimeUp();
+          }
+        }, 1000);
+      }
+
+      function updateTimerDisplay() {
+        let m = Math.floor(timeLeft / 60);
+        let s = timeLeft % 60;
+        document.getElementById('timerBadge').innerText = 
+          `${m < 10 ? '0' + m : m}:${s < 10 ? '0' + s : s}`;
+      }
+
+      function handleTimeUp() {
+        stopBGM();
+        playVictorySound();
+        if (ropePosition < 0 || stateP1.score > stateP2.score) {
+          showWinnerDialog('🏆 ក្រុមខៀវ ជាអ្នកឈ្នះ!', 'អស់ពេល! ក្រុមខៀវរកពិន្ទុបានច្រើនជាង');
+        } else if (ropePosition > 0 || stateP2.score > stateP1.score) {
+          showWinnerDialog('🏆 ក្រុមក្រហម ជាអ្នកឈ្នះ!', 'អស់ពេល! ក្រុមក្រហមរកពិន្ទុបានច្រើនជាង');
+        } else {
+          showWinnerDialog('🤝 លទ្ធផលស្មើគ្នា!', 'ពិន្ទុស្មើគ្នានៅពេលចប់ម៉ោង');
+        }
+      }
+
+      function getRandomByDigits(d) {
+        let min = Math.pow(10, d - 1);
+        let max = Math.pow(10, d) - 1;
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+      }
+
+      function roundNumber(val, targetUnit) {
+        return Math.round(val / targetUnit) * targetUnit;
+      }
+
+      function generateRoundingTask() {
+        let mode = selectedRoundingMode;
+        if (mode === 'mix') {
+          let modes = ['ten', 'hundred', 'thousand'];
+          mode = modes[Math.floor(Math.random() * modes.length)];
+        }
+
+        let targetUnit = 10;
+        let instruction = '';
+        let minAllowedDigits = 2;
+
+        if (mode === 'ten') {
+          targetUnit = 10;
+          instruction = '🎯 បង្គត់ត្រឹម ខ្ទង់ដប់';
+          minAllowedDigits = 2; // ឧ. 45 -> 50
+        } else if (mode === 'hundred') {
+          targetUnit = 100;
+          instruction = '🎯 បង្គត់ត្រឹម ខ្ទង់រយ';
+          minAllowedDigits = 3; // ឧ. 345 -> 300
+        } else {
+          targetUnit = 1000;
+          instruction = '🎯 បង្គត់ត្រឹម ខ្ទង់ពាន់';
+          minAllowedDigits = 4; // ឧ. 4820 -> 5000
+        }
+
+        let curDigits = selectedDigits;
+        if (curDigits === 'mixed') {
+          let minD = Math.max(minAllowedDigits, 2);
+          curDigits = Math.floor(Math.random() * (4 - minD + 1)) + minD;
+        } else {
+          if (curDigits < minAllowedDigits) {
+            curDigits = minAllowedDigits;
+          }
+        }
+
+        let num = getRandomByDigits(curDigits);
+        if (num % targetUnit === 0) {
+          num += (Math.floor(Math.random() * (targetUnit - 1)) + 1);
+        }
+
+        let ans = roundNumber(num, targetUnit);
+
+        return {
+          instruction: instruction,
+          displayContent: num.toString(),
+          answer: ans.toString()
+        };
+      }
+
+      function updateQuestion(pNum) {
+        let task = generateRoundingTask();
+        let state = pNum === 1 ? stateP1 : stateP2;
+        state.instruction = task.instruction;
+        state.displayContent = task.displayContent;
+        state.answer = task.answer;
+        state.currentInput = '';
+
+        document.getElementById(`task-inst-p${pNum}`).innerText = task.instruction;
+        document.getElementById(`task-content-p${pNum}`).innerText = task.displayContent;
+
+        renderInput(pNum);
+        syncTaskToMobile(pNum);
+      }
+
+      function pressKey(pNum, val) {
+        playTapSound();
+        let state = pNum === 1 ? stateP1 : stateP2;
+        if (val === 'DEL') state.currentInput = state.currentInput.slice(0, -1);
+        else if (state.currentInput.length < 8) state.currentInput += val;
+        renderInput(pNum);
+      }
+
+      function renderInput(pNum) {
+        let state = pNum === 1 ? stateP1 : stateP2;
+        let el = document.getElementById(`input-p${pNum}`);
+        if (state.currentInput === '') {
+          el.innerText = '?';
+          el.classList.add('placeholder');
+        } else {
+          el.innerText = state.currentInput;
+          el.classList.remove('placeholder');
+        }
+      }
+
+      function submitRoundingAnswer(pNum) {
+        let state = pNum === 1 ? stateP1 : stateP2;
+        if (state.currentInput === '') return;
+        if (state.currentInput === state.answer) {
+          handleCorrect(pNum);
+        } else {
+          handleWrong(pNum);
+        }
+      }
+
+      function handleCorrect(pNum) {
+        playCorrectSound();
+        if (pNum === 1) {
+          ropePosition -= 1;
+          stateP1.score++;
+          document.getElementById('score-p1').innerText = '★ ' + stateP1.score;
+          document.getElementById('lbl-score-left').innerText = stateP1.score;
+        } else {
+          ropePosition += 1;
+          stateP2.score++;
+          document.getElementById('score-p2').innerText = '★ ' + stateP2.score;
+          document.getElementById('lbl-score-right').innerText = stateP2.score;
+        }
+
+        updateRopeUI();
+
+        if (Math.abs(ropePosition) >= WIN_LIMIT) {
+          stopBGM();
+          playVictorySound();
+          clearInterval(timerInterval);
+          showWinnerDialog(
+            ropePosition < 0 ? '🏆 ក្រុមខៀវ ជាអ្នកឈ្នះ!' : '🏆 ក្រុមក្រហម ជាអ្នកឈ្នះ!',
+            'បានទាញព្រ័ត្រដល់គោលដៅជោគជ័យ!'
+          );
+        } else {
+          updateQuestion(pNum);
+        }
+      }
+
+      function handleWrong(pNum) {
+        playWrongSound();
+        let panel = document.getElementById(`panel-${pNum}`);
+        panel.style.transform = 'translateX(-8px)';
+        setTimeout(() => panel.style.transform = 'translateX(8px)', 70);
+        setTimeout(() => panel.style.transform = 'translateX(-5px)', 140);
+        setTimeout(() => panel.style.transform = 'translateX(0)', 210);
+
+        let state = pNum === 1 ? stateP1 : stateP2;
+        state.currentInput = '';
+        renderInput(pNum);
+      }
+
+      function updateRopeUI() {
+        document.getElementById('ropeAssembly').style.transform = `translateX(${ropePosition * 34}px)`;
+        let blueW = ((WIN_LIMIT - ropePosition) / (WIN_LIMIT * 2)) * 100;
+        document.getElementById('gaugeBlue').style.width = `${blueW}%`;
+        document.getElementById('gaugeRed').style.width = `${100 - blueW}%`;
+      }
+
+      function showWinnerDialog(title, reason) {
+        document.getElementById('winnerText').innerText = title;
+        document.getElementById('winnerReason').innerText = reason;
+        document.getElementById('winnerModal').style.display = 'flex';
+      }
+
+      function resetFullGame() {
+        ropePosition = 0;
+        stateP1.score = 0; stateP2.score = 0;
+        document.getElementById('score-p1').innerText = '★ 0';
+        document.getElementById('score-p2').innerText = '★ 0';
+        document.getElementById('lbl-score-left').innerText = '0';
+        document.getElementById('lbl-score-right').innerText = '0';
+        document.getElementById('winnerModal').style.display = 'none';
+
+        updateRopeUI();
+        updateQuestion(1);
+        updateQuestion(2);
+      }
+
+      openSetupModal();
+    }
+  </script>
+</body>
+</html>
